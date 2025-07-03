@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Descargar MP3 de YouTube</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: #f4f6f8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h2 {
+      color: #222;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 12px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #resultado {
+      margin-top: 20px;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 10px 16px;
+      background-color: #28a745;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    a:hover {
+      background-color: #218838;
+    }
+
+    @media screen and (max-width: 500px) {
+      .container {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Convertidor YouTube a MP3</h2>
+
+    <input
+      type="text"
+      id="videoUrl"
+      placeholder="Pega el enlace del video de YouTube"
+    />
+    <button onclick="convertir()">Convertir</button>
+
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    async function convertir() {
+      const url = document.getElementById('videoUrl').value;
+      const resultado = document.getElementById('resultado');
+      resultado.innerHTML = 'Procesando...';
+
+      if (!url) {
+        resultado.innerHTML = 'Por favor, ingresa una URL válida.';
+        return;
+      }
+
+      try {
+        const res = await fetch('http://localhost:3001/api/convert', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoUrl: url })
+        });
+
+        const data = await res.json();
+
+        if (data.link) {
+          resultado.innerHTML = `
+            <p><strong>${data.title}</strong></p>
+            <a href="${data.link}" target="_blank" download>Descargar MP3</a>
+          `;
+        } else {
+          resultado.innerHTML = 'No se pudo convertir el video.';
+        }
+      } catch (err) {
+        resultado.innerHTML = 'Error al conectar con el servidor.';
+      }
+    }
+  </script>
+
+</body>
+</html>
