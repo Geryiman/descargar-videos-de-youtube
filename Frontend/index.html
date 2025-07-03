@@ -3,15 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Descargar MP3 de YouTube</title>
+  <title>Descarga YouTube a MP3</title>
+  <link rel="icon" href="data:," />
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
     body {
-      background: #f4f6f8;
+      font-family: Arial, sans-serif;
+      background: #1f1f1f;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -19,120 +17,78 @@
       height: 100vh;
       margin: 0;
     }
-
-    h2 {
-      color: #222;
-      margin-bottom: 20px;
+    h1 {
+      margin-bottom: 1rem;
+      color: #00ff88;
     }
-
-    .container {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 500px;
-      text-align: center;
-    }
-
     input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-
-    button {
-      padding: 12px 20px;
-      background-color: #007bff;
-      color: white;
+      width: 80%;
+      max-width: 500px;
+      padding: 10px;
+      font-size: 1rem;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #00ff88;
+      color: #000;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
-      transition: background 0.2s;
+      transition: background-color 0.3s ease;
     }
-
     button:hover {
-      background-color: #0056b3;
+      background-color: #00cc6e;
     }
-
-    #resultado {
-      margin-top: 20px;
-    }
-
-    a {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 10px 16px;
-      background-color: #28a745;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      transition: background 0.2s;
-    }
-
-    a:hover {
-      background-color: #218838;
-    }
-
-    @media screen and (max-width: 500px) {
-      .container {
-        padding: 1rem;
-      }
+    .mensaje {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
-
-  <div class="container">
-    <h2>Convertidor YouTube a MP3</h2>
-
-    <input
-      type="text"
-      id="videoUrl"
-      placeholder="Pega el enlace del video de YouTube"
-    />
-    <button onclick="convertir()">Convertir</button>
-
-    <div id="resultado"></div>
-  </div>
+  <h1>Descargar MP3 de YouTube</h1>
+  <input id="videoUrl" type="text" placeholder="Pega el enlace de YouTube aquí" />
+  <button onclick="convertir()">Convertir</button>
+  <div class="mensaje" id="mensaje"></div>
 
   <script>
     async function convertir() {
-      const url = document.getElementById('videoUrl').value;
-      const resultado = document.getElementById('resultado');
-      resultado.innerHTML = 'Procesando...';
+      const url = document.getElementById("videoUrl").value.trim();
+      const mensaje = document.getElementById("mensaje");
+      mensaje.textContent = "";
 
       if (!url) {
-        resultado.innerHTML = 'Por favor, ingresa una URL válida.';
+        mensaje.textContent = "⚠️ Pega un enlace válido.";
         return;
       }
 
+      mensaje.textContent = "⏳ Procesando, por favor espera...";
+
       try {
-        const res = await fetch('http://localhost:3001/api/convert', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("http://german.local:3002/api/convert", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ videoUrl: url })
         });
 
         const data = await res.json();
 
-        if (data.link) {
-          resultado.innerHTML = `
-            <p><strong>${data.title}</strong></p>
-            <a href="${data.link}" target="_blank" download>Descargar MP3</a>
-          `;
+        if (data && data.link) {
+          mensaje.textContent = "✅ ¡Listo! Tu descarga comenzará en una nueva pestaña.";
+          window.open(data.link, "_blank");
         } else {
-          resultado.innerHTML = 'No se pudo convertir el video.';
+          mensaje.textContent = "❌ No se pudo obtener el MP3.";
         }
       } catch (err) {
-        resultado.innerHTML = 'Error al conectar con el servidor.';
+        console.error(err);
+        mensaje.textContent = "❌ Error al conectar con el servidor.";
       }
     }
   </script>
-
 </body>
 </html>
